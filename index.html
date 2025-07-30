@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spin the Wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      margin-top: 50px;
+    }
+    #arrow {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 30px solid black;
+      margin: 0 auto;
+      position: relative;
+      top: 25px;
+      z-index: 2;
+    }
+    #spinButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div id="arrow"></div>
+  <canvas id="wheelCanvas" width="500" height="500"></canvas>
+  <br>
+  <button id="spinButton" onclick="spin()">Spin the Wheel</button>
+  <div id="result"></div>
+
+  <script>
+    const names = ["Amy", "Adam", "Bushy", "Steve", "Matt", "Perry", "Jarrod"];
+    const colors = ["#9b59b6", "#e74c3c", "#e67e22", "#f1c40f", "#27ae60", "#1abc9c", "#2c3e50"];
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const radius = canvas.width / 2;
+    let startAngle = 0;
+    let spinning = false;
+    let audio = null;
+
+    function drawWheel() {
+      const arc = Math.PI * 2 / names.length;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < names.length; i++) {
+        const angle = startAngle + i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius - 10, angle, angle + arc, false);
+        ctx.fill();
+        ctx.save();
+
+        ctx.fillStyle = "black";
+        ctx.translate(
+          radius + Math.cos(angle + arc / 2) * (radius - 60),
+          radius + Math.sin(angle + arc / 2) * (radius - 60)
+        );
+        ctx.rotate(angle + arc / 2);
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(names[i], -ctx.measureText(names[i]).width / 2, 5);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#222";
+      ctx.lineWidth = 8;
+      ctx.arc(radius, radius, radius - 10, 0, Math.PI * 2, false);
+      ctx.stroke();
+    }
+
+    function spin() {
+      if (spinning) return;
+
+      spinning = true;
+      document.getElementById("result").innerText = "";
+      const spinButton = document.getElementById("spinButton");
+      spinButton.disabled = true;
+      spinButton.innerText = "Spinning...";
+
+      const index = Math.floor(Math.random() * names.length);
+      const arc = 2 * Math.PI / names.length;
+      const stopAngle = (3 * Math.PI / 2) - (index * arc) - arc / 2;
+      const extraSpins = 8;
+      const finalAngle = startAngle + extraSpins * 2 * Math.PI + (stopAngle - (startAngle % (2 * Math.PI)));
+
+      const duration = 6000;
+      const frames = 60;
+      const interval = 1000 / frames;
+      const steps = Math.round(duration / interval);
+      let step = 0;
+      const initialAngle = startAngle;
+
+      function animateSpin() {
+        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+        const t = step / steps;
+        startAngle = initialAngle + (finalAngle - initialAngle) * easeOut(t);
+        drawWheel();
+
+        if (step < steps) {
+          step++;
+          setTimeout(animateSpin, interval);
+        } else {
+          stopRotateWheel(index);
+          spinning = false;
+          spinButton.disabled = false;
+          spinButton.innerText = "Spin the Wheel";
+        }
+      }
+
+      animateSpin();
+    }
+
+    function stopRotateWheel(index) {
+      const selected = names[index];
+      document.getElementById("result").innerText = `${selected} was selected!`;
+
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+
+      audio = new Audio(`songs/${selected.toLowerCase()}.mp3`);
+      audio.play().catch(err => console.error("Audio failed to play:", err));
+    }
+
+    drawWheel();
+  </script>
+</body>
+</html>
