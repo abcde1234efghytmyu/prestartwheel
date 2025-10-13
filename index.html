@@ -43,8 +43,16 @@
   <div id="result"></div>
 
   <script>
-    const names = ["Amy", "Adam", "Bushy", "Steve", "Matt", "Perry", "Jarrod"];
-    const colors = ["#9b59b6", "#e74c3c", "#e67e22", "#f1c40f", "#27ae60", "#1abc9c", "#2c3e50"];
+    const names = [
+      "Amy", "Adam", "Bushy", "Steve", "Matt", "Perry", "Jarrod",
+      "Nath", "Alex", "Ben", "Pete", "Rory", "Dylan", "Marc"
+    ];
+
+    const colors = [
+      "#9b59b6", "#e74c3c", "#e67e22", "#f1c40f", "#27ae60", "#1abc9c", "#2c3e50",
+      "#8e44ad", "#2980b9", "#16a085", "#d35400", "#34495e", "#c0392b", "#7f8c8d"
+    ];
+
     const canvas = document.getElementById("wheelCanvas");
     const ctx = canvas.getContext("2d");
     const radius = canvas.width / 2;
@@ -59,7 +67,7 @@
       for (let i = 0; i < names.length; i++) {
         const angle = startAngle + i * arc;
         ctx.beginPath();
-        ctx.fillStyle = colors[i];
+        ctx.fillStyle = colors[i % colors.length];
         ctx.moveTo(radius, radius);
         ctx.arc(radius, radius, radius - 10, angle, angle + arc, false);
         ctx.fill();
@@ -71,7 +79,7 @@
           radius + Math.sin(angle + arc / 2) * (radius - 60)
         );
         ctx.rotate(angle + arc / 2);
-        ctx.font = "bold 18px Arial";
+        ctx.font = "bold 16px Arial";
         ctx.fillText(names[i], -ctx.measureText(names[i]).width / 2, 5);
         ctx.restore();
       }
