@@ -132,6 +132,39 @@
 
       animateSpin();
     }
+<script>
+  // Map display names to the actual file names you have in /songs
+  const audioFileMap = {
+    "Shelly": "Shelly.mp3",   // adjust these if your actual filenames differ
+    "KP": "KP.mp3",
+    "Davis": "Davis.mp3",
+  };
+
+  function filenameFromName(name) {
+    // Default rule: lowercase + no spaces
+    const defaultName = name.toLowerCase().replace(/\s+/g, "");
+    return audioFileMap[name] || `${defaultName}.mp3`;
+  }
+
+  // your existing code continues here
+  function stopRotateWheel(index) {
+    const selected = names[index];
+    document.getElementById("result").innerText = `${selected} was selected!`;
+
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    const file = filenameFromName(selected);
+    audio = new Audio(`songs/${file}`);
+    audio.play().catch(err => {
+      console.error("Audio failed to play:", err, "Tried:", file);
+      document.getElementById("result").innerText =
+        `${selected} was selected, but I couldn't play “${file}”. Check the filename/case.`;
+    });
+  }
+</script>
 
     function stopRotateWheel(index) {
       const selected = names[index];
@@ -150,5 +183,6 @@
   </script>
 </body>
 </html>
+
 
 
