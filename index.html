@@ -143,7 +143,7 @@
         audio.currentTime = 0;
       }
 
-      audio = new Audio(`songs/${selected.toLowerCase()}.m4a`);
+      audio = new Audio(`songs/${selected.toLowerCase()}.mp3`);
       audio.play().catch(err => console.error("Audio failed to play:", err));
     }
 
